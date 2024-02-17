@@ -23,4 +23,7 @@
         <file>opengl/fragment_yuv.fsh</file>
         <file>opengl/vertex_yuv.vsh</file>
     </qresource>
+    <qresource prefix="/">
+        <file>qss/widget.qss</file>
+    </qresource>
 </RCC>

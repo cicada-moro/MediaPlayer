@@ -1,16 +1,20 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QFile>
 #include "ui_mainwindow.h"
 
-int main1(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Floor);
-
+    QFile qssFile(":/qss/widget.qss");
+    if(qssFile.exists())
+        qDebug()<<"";
+    if(qssFile.open(QFile::ReadOnly)) {
+        a.setStyleSheet(qssFile.readAll());
+    }
     MainWindow w;
     w.show();
-    w.ui->video->updateImage(QImage("C:\\Users\\moro\\Pictures\\Camera Roll\\9f001542788d14d61c1615952cf08d42400984833.jpg"));
 
     return a.exec();
 }
@@ -154,7 +158,7 @@ int main2(int argc, char *argv[])
 #include "src/mythread/myaudiothread.h"
 #include "src/mythread/myvideothread.h"
 
-int main(int argc, char *argv[])
+int main3(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     //    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Floor);
@@ -175,10 +179,11 @@ int main(int argc, char *argv[])
 
     MyaudioThread audioplay;
     MyVideoThread videoplay;
+    MyAudioPlay audio;
 
     QFuture<void> thread =QtConcurrent::run([&](){
 
-            audioplay.open(demux.copyAStream());
+            audioplay.open(demux.copyAStream(),&audio);
             videoplay.openNoSws(demux.copyVPara(),w.ui->video);
             audioplay.start();
             videoplay.start();
@@ -201,6 +206,36 @@ int main(int argc, char *argv[])
                 }
             }
     });
+
+    return a.exec();
+}
+
+
+
+
+
+#include "src/mythread/myplaythread.h"
+int main4(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    //    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Floor);
+    MainWindow w;
+    w.show();
+
+    //=================1、解封装测试====================
+    QString url ="C:\\Users\\moro\\Videos\\outputname.mp4";
+    QString url1 = "C:\\Users\\moro\\Music\\花に亡霊（电影《想哭的我戴上了猫的面具》主题曲）-ヨルシカ.128.mp3";
+
+    MyPlayThread t;
+    MyAudioPlay audioplay;
+
+    t.open(url,w.ui->video,false,&audioplay);
+    t.start();
+    t.pause();
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    t.resume();
 
     return a.exec();
 }

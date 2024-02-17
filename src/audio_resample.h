@@ -22,8 +22,10 @@ public:
     int getResample(int outformat,
                     AVFrame *frame,
                     uchar* pcm);
+
 private:
     SwrContext  *_m_swrContext=nullptr;
+
     std::mutex _mutex; // 互斥锁
 };
 

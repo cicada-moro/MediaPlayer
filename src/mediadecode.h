@@ -23,6 +23,10 @@ public:
     AVFrame *receive();
 
     void close();
+    qint64 pts() const;
+
+    AVCodecContext *codeccontext() const;
+
 private:
 
     void showError(int err);
@@ -39,7 +43,8 @@ private:
     AVFrame *_avframe=nullptr;
 
     int _stream_index=-1;
-    qint64 _pts;
+    qint64 _pts;   
+
     char *_error=nullptr;
     bool _is_end=false;
 

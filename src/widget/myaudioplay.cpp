@@ -21,6 +21,8 @@ bool MyAudioPlay::open()
     QAudioDevice m_device=m_devices->defaultAudioOutput();
     QAudioFormat fmt=m_device.preferredFormat();
     _m_sink=new QAudioSink(m_device,fmt);
+    _m_sink->setVolume(0.3);
+
 
     //IODevice获取本机扬声器
     _io=_m_sink->start();
@@ -75,6 +77,25 @@ int MyAudioPlay::getFree()
     }
     int free = _m_sink->bytesFree();
     return free;
+}
+
+void MyAudioPlay::setVolume(qreal value)
+{
+    if(!_m_sink){
+        return;
+    }
+    std::unique_lock<std::mutex> guard(_mutex);
+
+    _m_sink->setVolume(value);
+}
+
+void MyAudioPlay::flushBuffer()
+{
+    std::unique_lock<std::mutex> guard(_mutex);
+    if(_m_sink){
+        _m_sink->reset();
+        _io->reset();
+    }
 }
 
 

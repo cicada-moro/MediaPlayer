@@ -48,7 +48,6 @@ bool MediaDecode::setCodec(AVStream *stream)
     _codeccontext->thread_count = 8;                 // 使用8线程解码
     _codeccontext->pkt_timebase = stream->time_base; //解决音频Could not update timestamps for skipped samples
 
-
     ret=avcodec_open2(_codeccontext,nullptr,nullptr);
     if(ret<0){
         showError(ret);
@@ -171,6 +170,7 @@ AVFrame *MediaDecode::receive()
 
 
     _pts=this->_avframe->pts;
+
 #if PRINT_LOG
     qDebug() << "this frame's pts:"<<_pts;
 #endif
@@ -187,6 +187,11 @@ void MediaDecode::showError(int err)
 #else
     Q_UNUSED(err)
 #endif
+}
+
+double MediaDecode::r2d(AVRational *r)
+{
+    return r->den == 0 ? 0 : (double)r->num / (double)r->den;
 }
 
 void MediaDecode::close()
@@ -244,5 +249,15 @@ void MediaDecode::receiveNullPacket(AVPacket *pkt)
 {
 
     avcodec_send_packet(_codeccontext, pkt);
+}
+
+AVCodecContext *MediaDecode::codeccontext() const
+{
+    return _codeccontext;
+}
+
+qint64 MediaDecode::pts() const
+{
+    return _pts;
 }
 

@@ -21,13 +21,17 @@ public:
     //播放音频
     bool write(const uchar *data, int datasize);
     int getFree();
+    void setVolume(qreal);
+    void flushBuffer();
 
     int sampleRate = 44100;
     int sampleSize = 16;
     int channels = 2;
+
 private:
     QIODevice *_io = nullptr;
     QAudioSink *_m_sink=nullptr;
+    double _volume;
     std::mutex _mutex;
 };
 

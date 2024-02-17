@@ -1,7 +1,7 @@
-QT       += core gui
-QT += core gui opengl widgets openglwidgets
-QT += multimedia
-QT += concurrent
+QT      += core gui
+QT      += core gui opengl widgets openglwidgets
+QT      += multimedia
+QT      += concurrent
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -19,10 +19,15 @@ SOURCES += \
     src/mediadecode.cpp \
     src/mediademux.cpp \
     src/mythread/myaudiothread.cpp \
+    src/mythread/myplaythread.cpp \
     src/mythread/myvideothread.cpp \
+    src/sonic/sonic.c \
     src/video_swsscale.cpp \
     src/widget/myaudioplay.cpp \
-    src/widget/myopenglwidget.cpp
+    src/widget/myborder.cpp \
+    src/widget/mybordercontainer.cpp \
+    src/widget/myopenglwidget.cpp \
+    src/widget/myslider.cpp
 
 HEADERS += \
     src/audio_resample.h \
@@ -30,16 +35,21 @@ HEADERS += \
     src/mediadecode.h \
     src/mediademux.h \
     src/mythread/myaudiothread.h \
+    src/mythread/myplaythread.h \
     src/mythread/myvideothread.h \
+    src/sonic/sonic.h \
     src/video_swsscale.h \
     src/widget/myaudioplay.h \
-    src/widget/myopenglwidget.h
+    src/widget/mybordercontainer.h \
+    src/widget/myopenglwidget.h \
+    src/widget/myslider.h
 
 FORMS += \
     src/mainwindow.ui
 
 INCLUDEPATH += \
     $$PWD/include
+
 LIBS += -L$$PWD/lib\
     -lavcodec \
     -lavdevice \
@@ -95,4 +105,5 @@ DISTFILES += \
     res/opengl/fragment_yuv.fsh \
     res/opengl/vertex.vsh \
     res/opengl/vertex_yuv.vsh \
+    res/qss/widget.qss \
     vertex.vsh

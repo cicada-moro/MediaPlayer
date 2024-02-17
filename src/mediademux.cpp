@@ -70,7 +70,8 @@ bool MediaDemux::openUrl(const QString &url)
         free();
         return false;
     }
-    _total_time=_formatcontext->duration/(AV_TIME_BASE/1000);
+
+    _total_time=_formatcontext->duration/(AV_TIME_BASE);
 #if PRINT_LOG
     qDebug() << QString("视频总时长：%1 ms，[%2]").arg(_total_time).arg(QTime::fromMSecsSinceStartOfDay(int(_total_time)).toString("HH:mm:ss zzz"));
 #endif
@@ -169,6 +170,9 @@ AVPacket *MediaDemux::read()
         av_packet_free(&packet);
 //        free();
         showError(ret);
+        if(ret == AVERROR_EOF){
+            _is_end=true;
+        }
         return nullptr;
     }
 
@@ -287,8 +291,8 @@ bool MediaDemux::seek(double position)
     // 清理先前未滑动时解码到的视频帧
     avformat_flush(_formatcontext);
 
-    long long seek_position  = static_cast<long long>(_formatcontext->streams[_videostream_index]->duration * position); // 计算要移动到的位置
-    int ret = av_seek_frame(_formatcontext, _videostream_index, seek_position, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+    long long seek_position  = static_cast<long long>( AV_TIME_BASE * position); // 计算要移动到的位置
+    int ret = av_seek_frame(_formatcontext,-1, seek_position, AVSEEK_FLAG_BACKWARD);
     if (ret < 0){
 //        free();
         return false;
@@ -361,6 +365,23 @@ void MediaDemux::free()
 //        delete [] m_buffer;
 //        m_buffer = nullptr;
     //    }
+}
+
+MediaDemux::MEDIO_TYPE MediaDemux::type;
+MediaDemux::MEDIO_TYPE MediaDemux::getType()
+{
+    return type;
+}
+
+
+qint64 MediaDemux::total_time() const
+{
+    return _total_time;
+}
+
+long MediaDemux::video_framerate() const
+{
+    return _video_framerate;
 }
 
 QSize MediaDemux::size() const

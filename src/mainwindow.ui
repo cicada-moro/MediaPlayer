@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>967</width>
-    <height>644</height>
+    <width>961</width>
+    <height>654</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
-    <string notr="true">background:rgb(170, 255, 255)</string>
+    <string notr="true">background:rgb(184, 184, 184)</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,10">
     <property name="spacing">
@@ -164,6 +164,9 @@
              <property name="enabled">
               <bool>true</bool>
              </property>
+             <property name="styleSheet">
+              <string notr="true">QWidget{background:transparent;}</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -189,7 +192,10 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="15,1,3">
               <item>
-               <widget class="QSlider" name="video_slider">
+               <widget class="MySlider" name="video_slider">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="cursor">
                  <cursorShape>PointingHandCursor</cursorShape>
                 </property>
@@ -266,6 +272,9 @@ border-radius: 4px;
               </item>
               <item>
                <widget class="QSlider" name="volume_slider">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="styleSheet">
                  <string notr="true">QSlider::groove:horizontal { 
 border: 1px solid #bbb; 
@@ -321,6 +330,9 @@ border: 1px solid #aaa;
 border-radius: 4px; 
 } </string>
                 </property>
+                <property name="value">
+                 <number>30</number>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -334,6 +346,9 @@ border-radius: 4px;
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
                  <widget class="QPushButton" name="start">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>
@@ -357,6 +372,9 @@ border-radius: 4px;
                 </item>
                 <item>
                  <widget class="QPushButton" name="restart">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>
@@ -427,7 +445,7 @@ border-radius: 4px;
                </layout>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
+               <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
                 <property name="spacing">
                  <number>200</number>
                 </property>
@@ -443,8 +461,14 @@ border-radius: 4px;
                 </item>
                 <item>
                  <widget class="QComboBox" name="multiple">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="currentText">
+                   <string>倍数:1</string>
                   </property>
                   <property name="maxVisibleItems">
                    <number>10</number>
@@ -466,12 +490,12 @@ border-radius: 4px;
                   </property>
                   <item>
                    <property name="text">
-                    <string>倍数:1</string>
+                    <string>倍数:0.5</string>
                    </property>
                   </item>
                   <item>
                    <property name="text">
-                    <string>倍数:0.5</string>
+                    <string>倍数:1</string>
                    </property>
                   </item>
                   <item>
@@ -545,8 +569,20 @@ border-radius: 4px;
    </layout>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -567,6 +603,11 @@ border-radius: 4px;
    <property name="text">
     <string>打开</string>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>6</pointsize>
+    </font>
+   </property>
   </action>
  </widget>
  <customwidgets>
@@ -574,6 +615,11 @@ border-radius: 4px;
    <class>MyOpenGLWidget</class>
    <extends>QOpenGLWidget</extends>
    <header location="global">src/widget/myopenglwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MySlider</class>
+   <extends>QSlider</extends>
+   <header location="global">src/widget/myslider.h</header>
   </customwidget>
  </customwidgets>
  <resources>

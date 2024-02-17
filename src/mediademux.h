@@ -30,13 +30,13 @@ public:
     bool seek(double position);
     bool isEnd();
     void close();
+    void clear();
     QSize size() const;
 
 private:
     void initFFmpeg();
     void showError(int err);
     double r2d(AVRational *rational);
-    void clear();
     void free();
 signals:
     void sendNullPacket(AVPacket *pkt);
@@ -46,7 +46,14 @@ public:
         ONLY_VIDEO=1,
         ONLY_AUDIO,
         DOUBLE_AV
-    }type;
+    }static type;
+    qint64 total_time() const;
+
+    long video_framerate() const;
+
+
+    static MEDIO_TYPE getType();
+
 private:
     AVFormatContext *_formatcontext=nullptr;
 
