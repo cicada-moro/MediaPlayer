@@ -1,5 +1,10 @@
 #include "myaudiothread.h"
+#include "SDL/SDL_audio.h"
+#include "src/widget/sdlaudioplay.h"
 #include <QDebug>
+
+//定义音频数据格式
+#define AUDIO_FORMAT AV_SAMPLE_FMT_S16
 
 MyaudioThread::MyaudioThread()
 {
@@ -28,6 +33,8 @@ bool MyaudioThread::open(AVStream *stream,MyAudioPlay *audioplay)
 
     _sonicstream=sonicCreateStream(stream->codecpar->sample_rate,stream->codecpar->channels);
 
+    audioplay->setAudioPara(stream->codecpar->sample_rate,stream->codecpar->frame_size,
+                            AUDIO_FORMAT,stream->codecpar->channels);
     this->_audioplay=audioplay;
 
     if (!_res){
@@ -149,7 +156,7 @@ void MyaudioThread::run()
                 break;
             }
             //重采样
-            int len = _res->getResample(AV_SAMPLE_FMT_S16,frame, pcm);
+            int len = _res->getResample(AUDIO_FORMAT,frame, pcm);
             //播放音频
 
             if(_speed!=1){
@@ -157,7 +164,10 @@ void MyaudioThread::run()
                 if(len ==0 ){
                     sonicFlushStream(_sonicstream);
                 }else{
-                    len=len/frame->channels/ av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
+//                    由于sonic库处理的数据为short类型或者float类型，但是ffmpeg重采样后的数据和
+//                    SDL使用的数据都是uint8类型，所以这里数据长度就需要重新计算：
+//                    原始的数据长度/(音频通道数 * S16类型数据所占字节数)
+                    len=len/frame->channels/ av_get_bytes_per_sample(AUDIO_FORMAT);
                     int ret = sonicWriteShortToStream(_sonicstream, pcm_sonic, len);
                     if(!ret){
                         qDebug()<<"sonic false!!";
@@ -165,7 +175,7 @@ void MyaudioThread::run()
                     else{
                         int sample = sonicSamplesAvailable(_sonicstream);
                         len = sonicReadShortFromStream(_sonicstream, pcm_sonic, sample);
-                        len=len*frame->channels*av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
+                        len=len*frame->channels*av_get_bytes_per_sample(AUDIO_FORMAT);
                         pcm=(uchar*)pcm_sonic;
                     }
                 }
@@ -176,11 +186,18 @@ void MyaudioThread::run()
             emit setProgressTime(_pts/1000);
 
             while (!_isExit){
-                while(_audioplay->getFree()<len){
-                    QThread::msleep(1);
+                if(!_usesdl){
+                    while(_audioplay->getFree()<len){
+                        QThread::msleep(1);
+                    }
+                    _audioplay->write(pcm, len);
+                    break;
                 }
-                _audioplay->write(pcm, len);
-                break;
+                else{
+//                    static_cast<SDLAudioPlay*>(_audioplay)->_sdlAudioSpec.freq/=2;
+                    _audioplay->write(pcm,len);
+                    break;
+                }
             }
         }
         _mutex.unlock();
@@ -199,6 +216,16 @@ void MyaudioThread::close()
     if(_audioplay){
         _audioplay=nullptr;
     }
+}
+
+bool MyaudioThread::usesdl() const
+{
+    return _usesdl;
+}
+
+void MyaudioThread::setUsesdl(bool newUsesdl)
+{
+    _usesdl = newUsesdl;
 }
 
 qint64 MyaudioThread::_pts=-1;

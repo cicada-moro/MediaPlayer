@@ -172,6 +172,7 @@ void MyVideoThread::run()
 
             if(!_UseYUV){
                 QImage image=_sws->getScaleImage(_videoplay->width(),_videoplay->height(),frame);
+
 //                    w.ui->video->setPixmap(QPixmap::fromImage(image));
                 if(image.format()==QImage::Format_Invalid){
                     continue;

@@ -64,7 +64,7 @@ private:
     QPoint      _mouseStartPoint;
     QPoint      _windowTopLeftPoint;
     MyBorderContainer *_border=nullptr;
-    MyAudioPlay _audioplay;
+    MyAudioPlay *_audioplay=nullptr;
     QString _videofmt;
     QString _audiofmt;
 
@@ -73,6 +73,7 @@ private:
     bool _is_open=false;
     bool _is_start=false;
     bool _is_finish=false;
+    bool _useSDL=true;
 
     qint64 _totaltime=-1;
     qint64 _currenttime=-1;
@@ -86,5 +87,14 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
 
+
+    // QWidget interface
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
+
+
+    // QWidget interface
+protected:
+    virtual void keyReleaseEvent(QKeyEvent *event) override;
 };
 #endif // MAINWINDOW_H

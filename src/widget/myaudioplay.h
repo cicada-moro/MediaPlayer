@@ -7,31 +7,36 @@
 #include <QMediaDevices>
 #include <QAudioDevice>
 #include <QAudioSink>
-#include <QThread>
 
-class MyAudioPlay:public QThread
+class MyAudioPlay
 {
 public:
     MyAudioPlay();
-    ~MyAudioPlay();
+    virtual ~MyAudioPlay();
 
     //打开音频播放
-    bool open();
-    void close();
-    //播放音频
-    bool write(const uchar *data, int datasize);
-    int getFree();
-    void setVolume(qreal);
-    void flushBuffer();
+    virtual bool open()=0;
+    virtual void close()=0;
+    virtual void setVolume(qreal)=0;
+    virtual void flushBuffer()=0;
 
-    int sampleRate = 44100;
-    int sampleSize = 16;
-    int channels = 2;
+    virtual bool write(const uchar *data, int datasize);
+    virtual int getFree();
 
-private:
-    QIODevice *_io = nullptr;
-    QAudioSink *_m_sink=nullptr;
-    double _volume;
+    void setAudioPara(int sampleRate,
+                      int sampleSize,
+                      int format,
+                      int channels);
+
+    int _sampleRate = 44100;
+    int _sampleSize = 16;
+    int _format=1;
+    int _channels = 2;
+
+public:
+    static double _volume;
+
+protected:
     std::mutex _mutex;
 };
 

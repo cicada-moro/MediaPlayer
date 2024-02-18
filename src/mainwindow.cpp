@@ -1,10 +1,14 @@
 #include "mainwindow.h"
 #include "src/mythread/myplaythread.h"
+#include "src/widget/qtaudioplay.h"
+#include "src/widget/sdlaudioplay.h"
 #include "ui_mainwindow.h"
 #include <QMouseEvent>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QMovie>
+
+#define USE_SDL 1
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -30,6 +34,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->volume_icon->setScaledContents(true);
 
     ui->volume_slider->setRange(0,100);
+
+#ifdef USE_SDL
+    _useSDL=true;
+#else
+    _useSDL=false;
+#endif
+
+    if(!_useSDL){
+        _audioplay=new QtAudioplay();
+    }
+    else{
+        _audioplay=new SDLAudioPlay();
+    }
 }
 
 MainWindow::~MainWindow()
@@ -218,11 +235,17 @@ void MainWindow::on_open_triggered()
             delete t;
             t=nullptr;
         }
+        ui->multiple->setCurrentText("倍数:1");
+        ui->volume_slider->setValue(30);
+        QPixmap volume_pix(":/image/image/volume.png");
+        ui->volume_icon->setPixmap(volume_pix);
+
         ui->start->setEnabled(false);
         ui->restart->setEnabled(false);
         ui->multiple->setEnabled(false);
         ui->volume_slider->setEnabled(false);
         ui->video_slider->setEnabled(false);
+
     }
     QFile file(url);
     QFileInfo fileinfo(url);
@@ -274,7 +297,7 @@ void MainWindow::on_open_triggered()
     });
 
     set_loadingimage(false);
-    t->open(url,this->ui->video,false,&_audioplay);
+    t->open(url,this->ui->video,false,_audioplay,_useSDL);
     _is_open=true;
 
     bool is_start=t->start();
@@ -308,6 +331,7 @@ void MainWindow::on_start_clicked()
             ui->start->setIcon(QIcon(":/image/image/stop.png"));
             _is_start=true;
 
+            connect(t,SIGNAL(setProgressTime(qint64)),this,SLOT(setProgressTime(qint64)));
             t->resume();
             return;
         }
@@ -316,6 +340,7 @@ void MainWindow::on_start_clicked()
             _is_start=false;
             qDebug()<<"set  Icon";
 
+            disconnect(t,SIGNAL(setProgressTime(qint64)),this,SLOT(setProgressTime(qint64)));
             t->pause();
 
             return;
@@ -333,8 +358,9 @@ void MainWindow::on_restart_clicked()
     }
     if(_is_start){
         t->pause();
-    }
+    }   
 
+    ui->multiple->setCurrentText("倍数:1");
     t->setSeek_time(0);
     t->seek();
     t->resume();
@@ -381,13 +407,18 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
         //            ui->video = new MyOpenGLWidget(ui->player);
         //            ui->video->setObjectName(QString::fromUtf8("video"));
         //            ui->video->setEnabled(true);
-//        t->disconnect();
+        t->disconnect();
         t->stop();
         t->deleteLater();
         t->wait();  //必须等待线程结束;
         delete t;
         t=nullptr;
     }
+    ui->multiple->setCurrentText("倍数:1");
+    ui->volume_slider->setValue(30);
+    QPixmap volume_pix(":/image/image/volume.png");
+    ui->volume_icon->setPixmap(volume_pix);
+
 
     ui->start->setEnabled(false);
     ui->restart->setEnabled(false);
@@ -434,7 +465,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
     });
 
     set_loadingimage(false);
-    t->open(url,this->ui->video,false,&_audioplay);
+    t->open(url,this->ui->video,false,_audioplay,_useSDL);
     _is_open=true;
 
     bool is_start=t->start();
@@ -451,6 +482,7 @@ void MainWindow::on_video_slider_sliderPressed()
         return;
     }
     //    ui->video_slider->setCursor(QCursor(Qt::PointingHandCursor));
+    disconnect(t,SIGNAL(setProgressTime(qint64)),this,SLOT(setProgressTime(qint64)));
     t->pause();
 
     if(!_is_finish){
@@ -473,6 +505,7 @@ void MainWindow::on_video_slider_sliderReleased()
 
     t->seek();
     t->_isSeek=true;
+    connect(t,SIGNAL(setProgressTime(qint64)),this,SLOT(setProgressTime(qint64)));
     t->resume();
 
     //尝试精确seek，但效率变低
@@ -505,9 +538,68 @@ void MainWindow::on_video_slider_valueChanged(int value)
     _currenttime=value;
 }
 
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if(!_is_open){
+        return;
+    }
+
+
+    if(event->key() == Qt::Key_Right){
+        disconnect(t,SIGNAL(setProgressTime(qint64)),this,SLOT(setProgressTime(qint64)));
+        t->pause();
+
+        ui->video_progress->setText(QString("%1/%2").arg(getShowTime(_currenttime+5)).arg(getShowTime(_totaltime)));
+        ui->video_slider->setSliderPosition(_currenttime+5);
+        t->setSeek_time(_currenttime+5);
+        _currenttime+=(5);
+    }
+    else if(event->key() == Qt::Key_Left){
+        disconnect(t,SIGNAL(setProgressTime(qint64)),this,SLOT(setProgressTime(qint64)));
+        t->pause();
+
+        ui->video_progress->setText(QString("%1/%2").arg(getShowTime(_currenttime-5)).arg(getShowTime(_totaltime)));
+        ui->video_slider->setSliderPosition(_currenttime-5);
+        t->setSeek_time(_currenttime-5);
+        _currenttime-=(5);
+    }
+
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    if(!_is_open){
+        return;
+    }
+
+    if(event->key() == Qt::Key_Right){
+        set_loadingimage(false);
+
+        t->seek();
+        t->_isSeek=true;
+        connect(t,SIGNAL(setProgressTime(qint64)),this,SLOT(setProgressTime(qint64)));
+        t->resume();
+    }
+    else if(event->key() == Qt::Key_Left){
+        set_loadingimage(false);
+
+        t->seek();
+        t->_isSeek=true;
+        connect(t,SIGNAL(setProgressTime(qint64)),this,SLOT(setProgressTime(qint64)));
+        t->resume();
+    }
+    else if(event->key() == Qt::Key_Space){
+        on_start_clicked();
+    }
+}
+
 
 void MainWindow::on_volume_slider_sliderMoved(int position)
 {
+    if(!_is_open){
+        return;
+    }
+
     //获取线性音量
     if(position<50 && position%10!=0){
         position=position+10-position%10;
@@ -527,7 +619,12 @@ void MainWindow::on_volume_slider_sliderMoved(int position)
     }
 
 //    qDebug()<<linearVolume;
-    _audioplay.setVolume(linearVolume);
+    if(!_useSDL){
+        _audioplay->setVolume(linearVolume);
+    }
+    else{
+        _audioplay->setVolume(position);
+    }
 }
 
 
@@ -577,11 +674,19 @@ void MainWindow::clearMember()
         delete t;
         t=nullptr;
     }
+    if(_audioplay){
+        delete _audioplay;
+        _audioplay=nullptr;
+    }
 }
 
 
 void MainWindow::on_multiple_currentTextChanged(const QString &arg1)
 {
+    if(!_is_open){
+        return;
+    }
+
     double speed=arg1.right(arg1.length()-arg1.indexOf(":")-1).toDouble();
     if(t && t->isRunning()){
         t->setSpeed(speed);

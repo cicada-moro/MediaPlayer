@@ -50,6 +50,7 @@ public:
     bool _isExit = false;
     bool _isPause = false;
 
+    bool _usesdl;
 
     qint64 static pts();
 
@@ -58,6 +59,9 @@ public:
 
     double speed() const;
     void setSpeed(double newSpeed);
+
+    bool usesdl() const;
+    void setUsesdl(bool newUsesdl);
 
 private:
     QList <AVPacket *> _packets;

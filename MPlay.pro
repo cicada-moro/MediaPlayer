@@ -27,7 +27,9 @@ SOURCES += \
     src/widget/myborder.cpp \
     src/widget/mybordercontainer.cpp \
     src/widget/myopenglwidget.cpp \
-    src/widget/myslider.cpp
+    src/widget/myslider.cpp \
+    src/widget/qtaudioplay.cpp \
+    src/widget/sdlaudioplay.cpp
 
 HEADERS += \
     src/audio_resample.h \
@@ -42,7 +44,9 @@ HEADERS += \
     src/widget/myaudioplay.h \
     src/widget/mybordercontainer.h \
     src/widget/myopenglwidget.h \
-    src/widget/myslider.h
+    src/widget/myslider.h \
+    src/widget/qtaudioplay.h \
+    src/widget/sdlaudioplay.h
 
 FORMS += \
     src/mainwindow.ui
@@ -58,7 +62,10 @@ LIBS += -L$$PWD/lib\
     -lavutil \
     -lpostproc \
     -lswresample \
-    -lswscale
+    -lswscale \
+    -lSDL2 \
+    -lSDL2main \
+    -lSDL2test
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

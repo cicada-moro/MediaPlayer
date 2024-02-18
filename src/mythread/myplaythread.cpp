@@ -10,7 +10,8 @@ MyPlayThread::~MyPlayThread()
     close();
 }
 
-bool MyPlayThread::open(const QString &url,MyOpenGLWidget *opengl,bool UseYUV,MyAudioPlay *audioplay)
+bool MyPlayThread::open(const QString &url,MyOpenGLWidget *opengl,bool UseYUV,
+                        MyAudioPlay *audioplay,bool UseSDL)
 {
     if(url.isNull() || url.isEmpty()){
         qWarning()<<"The url is null or empty";
@@ -24,11 +25,12 @@ bool MyPlayThread::open(const QString &url,MyOpenGLWidget *opengl,bool UseYUV,My
     std::thread t([&,ref(url)](){
         ret=_demux.openUrl(url);
         qDebug() << "demux.Open = " << ret;
-        qDebug() << "CopyVPara = " << _demux.copyVPara() << Qt::endl;
-        qDebug() << "CopyAPara = " << _demux.copyAPara() << Qt::endl;
+//        qDebug() << "CopyVPara = " << _demux.copyVPara() << Qt::endl;
+//        qDebug() << "CopyAPara = " << _demux.copyAPara() << Qt::endl;
         //        qDebug() << "seek=" << demux.seek(0.95) << Qt::endl;
     });
     t.join();
+
     if(!ret){
         qWarning()<<"The url open false!";
         _mutex.unlock();
@@ -44,7 +46,7 @@ bool MyPlayThread::open(const QString &url,MyOpenGLWidget *opengl,bool UseYUV,My
 
         _audioplay.setTime_base(_demux.copyAStream()->time_base);
 
-
+        _audioplay.setUsesdl(UseSDL);
         ret=_audioplay.open(_demux.copyAStream(),audioplay);
         if(!ret){
             _mutex.unlock();
@@ -196,15 +198,16 @@ void MyPlayThread::stop()
 
     if(_demux.type == _demux.ONLY_VIDEO ||
        _demux.type == _demux.DOUBLE_AV){
+        _videoplay.flushBuffers();
         _videoplay.stop();
         _videoplay.deleteLater();
 
         _videoplay.wait();  //必须等待线程结束;
-        _videoplay.flushBuffers();
     }
 
     if(_demux.type == _demux.ONLY_AUDIO ||
        _demux.type == _demux.DOUBLE_AV){
+        _audioplay.flushBuffers();
         _audioplay.stop();
         _audioplay.deleteLater();
 
@@ -305,7 +308,9 @@ double MyPlayThread::speed() const
 void MyPlayThread::setSpeed(double newSpeed)
 {
     _speed = newSpeed;
-    _audioplay.setSpeed(newSpeed);
+    if(_audioplay.isRunning()){
+        _audioplay.setSpeed(newSpeed);
+    }
     _videoplay.setSpeed(newSpeed);
 }
 

@@ -146,6 +146,7 @@ AVFrame *MediaDecode::receive()
 
     if(_avframe){
         av_frame_free(&this->_avframe);
+        _avframe=nullptr;
     }
     this->_avframe=av_frame_alloc();
 

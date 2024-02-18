@@ -10,6 +10,9 @@
     <height>654</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -71,6 +74,9 @@
            <property name="cursor">
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -87,6 +93,9 @@
           <widget class="QPushButton" name="window_expanded">
            <property name="cursor">
             <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="autoFillBackground">
             <bool>false</bool>
@@ -107,6 +116,9 @@
           <widget class="QPushButton" name="window_closed">
            <property name="cursor">
             <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string/>
@@ -198,6 +210,9 @@
                 </property>
                 <property name="cursor">
                  <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QSlider::groove:horizontal { 
@@ -352,6 +367,9 @@ border-radius: 4px;
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -378,6 +396,9 @@ border-radius: 4px;
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -401,6 +422,9 @@ border-radius: 4px;
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -423,6 +447,9 @@ border-radius: 4px;
                  <widget class="QPushButton" name="next">
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
                   </property>
                   <property name="text">
                    <string/>
@@ -468,7 +495,7 @@ border-radius: 4px;
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>
                   <property name="currentText">
-                   <string>倍数:1</string>
+                   <string>倍数:0.5</string>
                   </property>
                   <property name="maxVisibleItems">
                    <number>10</number>
@@ -517,6 +544,9 @@ border-radius: 4px;
                 <property name="cursor">
                  <cursorShape>PointingHandCursor</cursorShape>
                 </property>
+                <property name="focusPolicy">
+                 <enum>Qt::NoFocus</enum>
+                </property>
                 <property name="layoutDirection">
                  <enum>Qt::LeftToRight</enum>
                 </property>
@@ -559,7 +589,11 @@ border-radius: 4px;
           <number>2</number>
          </property>
          <item>
-          <widget class="QListView" name="listView"/>
+          <widget class="QListView" name="listView">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

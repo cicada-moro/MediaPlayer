@@ -13,7 +13,8 @@ public:
     MyPlayThread();
     ~MyPlayThread();
 
-    bool open(const QString &url,MyOpenGLWidget *opengl,bool UseYUV,MyAudioPlay *audioplay);
+    bool open(const QString &url,MyOpenGLWidget *opengl,bool UseYUV,
+              MyAudioPlay *audioplay,bool UseSDL);
     bool start();
     void pause();
     void resume();

@@ -4,6 +4,11 @@
 #include <QFile>
 #include "ui_mainwindow.h"
 
+extern "C"
+{
+#undef main//不加这个宏定义SDL会报错
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -21,9 +26,24 @@ int main(int argc, char *argv[])
 
 
 
+extern "C"
+{
+#include "SDL/SDL.h"
+#undef main
+}
 
+int main1(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    SDL_version version;
+    SDL_VERSION(&version);
+    qDebug()<<"version major is"<<version.major;
+    qDebug()<<"version minor is"<<version.minor;
 
-
+    return a.exec();
+}
 
 
 #define POINT_INFO 0
@@ -32,6 +52,7 @@ int main(int argc, char *argv[])
 #include "mediademux.h"
 #include "mediadecode.h"
 #include "video_swsscale.h"
+#include "src/widget/qtaudioplay.h"
 #include "ui_mainwindow.h"
 #include "audio_resample.h"
 #include "src/widget/myaudioplay.h"
@@ -75,8 +96,8 @@ int main2(int argc, char *argv[])
 
 
     QFuture<void> thread =QtConcurrent::run([&](){
-        MyAudioPlay audioplay;
-        audioplay.open();
+        MyAudioPlay *audioplay=new QtAudioplay();
+        audioplay->open();
         while(1)
         {
             AVPacket* pkt = demux.read();
@@ -91,10 +112,10 @@ int main2(int argc, char *argv[])
                 if(frame){
                     a_res=new Audio_resample();
                     int len = a_res->getResample(AV_SAMPLE_FMT_S16,frame, pcm);
-                    while(audioplay.getFree()<len){
+                    while(audioplay->getFree()<len){
                         QThread::msleep(10);
                     }
-                    audioplay.write(pcm, len);
+                    audioplay->write(pcm, len);
 //                    while (len > 0)
 //                    {
 //                        if (audioplay.getFree() >= len)
@@ -179,11 +200,11 @@ int main3(int argc, char *argv[])
 
     MyaudioThread audioplay;
     MyVideoThread videoplay;
-    MyAudioPlay audio;
+    MyAudioPlay *audio=new QtAudioplay();
 
     QFuture<void> thread =QtConcurrent::run([&](){
 
-            audioplay.open(demux.copyAStream(),&audio);
+            audioplay.open(demux.copyAStream(),audio);
             videoplay.openNoSws(demux.copyVPara(),w.ui->video);
             audioplay.start();
             videoplay.start();
@@ -227,9 +248,9 @@ int main4(int argc, char *argv[])
     QString url1 = "C:\\Users\\moro\\Music\\花に亡霊（电影《想哭的我戴上了猫的面具》主题曲）-ヨルシカ.128.mp3";
 
     MyPlayThread t;
-    MyAudioPlay audioplay;
+    MyAudioPlay *audioplay=new QtAudioplay();
 
-    t.open(url,w.ui->video,false,&audioplay);
+    t.open(url,w.ui->video,false,audioplay,false);
     t.start();
     t.pause();
 
