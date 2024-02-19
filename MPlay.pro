@@ -13,16 +13,16 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    src/audio_resample.cpp \
+    src/handler/audio_resample.cpp \
+    src/handler/mediadecode.cpp \
+    src/handler/mediademux.cpp \
+    src/handler/video_swsscale.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
-    src/mediadecode.cpp \
-    src/mediademux.cpp \
     src/mythread/myaudiothread.cpp \
     src/mythread/myplaythread.cpp \
     src/mythread/myvideothread.cpp \
     src/sonic/sonic.c \
-    src/video_swsscale.cpp \
     src/widget/myaudioplay.cpp \
     src/widget/myborder.cpp \
     src/widget/mybordercontainer.cpp \
@@ -32,15 +32,15 @@ SOURCES += \
     src/widget/sdlaudioplay.cpp
 
 HEADERS += \
-    src/audio_resample.h \
+    src/handler/audio_resample.h \
+    src/handler/mediadecode.h \
+    src/handler/mediademux.h \
+    src/handler/video_swsscale.h \
     src/mainwindow.h \
-    src/mediadecode.h \
-    src/mediademux.h \
     src/mythread/myaudiothread.h \
     src/mythread/myplaythread.h \
     src/mythread/myvideothread.h \
     src/sonic/sonic.h \
-    src/video_swsscale.h \
     src/widget/myaudioplay.h \
     src/widget/mybordercontainer.h \
     src/widget/myopenglwidget.h \

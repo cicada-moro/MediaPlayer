@@ -8,7 +8,7 @@
 #include <QFileDialog>
 #include <QMovie>
 
-#define USE_SDL 1
+#define USE_SDL 0
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->volume_slider->setRange(0,100);
 
-#ifdef USE_SDL
+#if USE_SDL
     _useSDL=true;
 #else
     _useSDL=false;
