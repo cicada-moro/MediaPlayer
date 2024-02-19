@@ -1,0 +1,54 @@
+QLineEdit {
+    border: none;
+    border-radius: 20px;
+    background-color: rgb(23,23,27,150);
+    font-family: "Microsoft YaHei";
+    font-size: 16px;
+    color:rgb(255,255,255);
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 2px;
+}
+
+QLabel {
+    color:rgb(255,255,255);
+    background-color: transparent;
+    font-family: "Microsoft YaHei";
+    font-size: 16px;
+}
+
+QPushButton {
+    border: none;
+    border-radius: 10px;
+    text-align: center;
+    background-color: rgb(255,255,255);
+    font-family: "Microsoft YaHei";
+    font-size: 16px;
+    color: rgb(20,20,20);
+    padding-bottom: 2px;
+}
+QPushButton:hover {
+    background-color: rgb(255,255,255);
+    color: rgb(255,92,56);
+}
+
+/*音量条*/
+QSlider::groove:horizontal#volume_slider {
+    border:0px;
+}
+QSlider::sub-page:horizontal#volume_slider {
+    background:rgb(241,241,241);
+    margin-top:3px;
+    margin-bottom:3px;
+}
+QSlider::add-page:horizontal#volume_slider {
+    background:rgb(92,92,92);
+    margin-top:3px;
+    margin-bottom:3px;
+}
+QSlider::handle:horizontal#volume_slider {
+    background-color: rgb(255,255,255);
+    border:none;
+    width:12px;
+    border-radius:6px;
+}
