@@ -55,6 +55,8 @@ private slots:
 
     void on_multiple_currentTextChanged(const QString &arg1);
 
+    void on_window_full_clicked();
+
 public:
     Ui::MainWindow *ui;
 
@@ -74,6 +76,7 @@ private:
     bool _is_start=false;
     bool _is_finish=false;
     bool _useSDL=true;
+    bool _isFull=false;
 
     qint64 _totaltime=-1;
     qint64 _currenttime=-1;

@@ -111,6 +111,16 @@ void MyOpenGLWidget::updateImage(AVFrame *frame)
 
     this->update();
 }
+
+void MyOpenGLWidget::clear()
+{
+    //取消绑定的纹理
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearDepth(1.0);//指定深度缓冲区中每个像素需要的值
+    glClear(GL_DEPTH_BUFFER_BIT);//清除深度缓冲区
+}
 // 三个顶点坐标XYZ，VAO、VBO数据播放，范围时[-1 ~ 1]直接
 static GLfloat vertices[] = {  // 前三列点坐标，后两列为纹理坐标
     1.0f,  1.0f, 0.0f, 1.0f, 1.0f,      // 右上角
@@ -122,6 +132,8 @@ static GLuint indices[] = {
     0, 1, 3,
     1, 2, 3
 };
+
+
 void MyOpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -189,7 +201,7 @@ void MyOpenGLWidget::initializeGL()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);                        // 设置为零以破坏现有的顶点数组对象绑定
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);        // 指定颜色缓冲区的清除值(背景色)
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);           // 指定颜色缓冲区的清除值(背景色)
 }
 
 void MyOpenGLWidget::resizeGL(int w, int h)
@@ -219,7 +231,16 @@ void MyOpenGLWidget::resizeGL(int w, int h)
 
 void MyOpenGLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT);     // 将窗口的位平面区域（背景）设置为先前由glClearColor、glClearDepth和选择的值
+    // 将窗口的位平面区域（背景）设置为先前由glClearColor、glClearDepth和选择的值
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+#if USE_YUV
+    //初始化窗口时不绘制
+    if(m_format == -1){
+        return;
+    }
+#endif
 
     m_program->bind();               // 绑定着色器
 
@@ -229,26 +250,29 @@ void MyOpenGLWidget::paintGL()
     // 绑定纹理
     switch (m_format)
     {
-    case AV_PIX_FMT_YUV420P:
-    {
-        if(m_texY && m_texU && m_texV)
+        case AV_PIX_FMT_YUV420P:
         {
-            m_texY->bind(0);
-            m_texU->bind(1);
-            m_texV->bind(2);
+            if(m_texY && m_texU && m_texV)
+            {
+                m_texY->bind(0);
+                m_texU->bind(1);
+                m_texV->bind(2);
+            }
+            break;
         }
-        break;
-    }
-    case AV_PIX_FMT_NV12:
-    {
-        if(m_texY && m_texUV)
+        case AV_PIX_FMT_NV12:
         {
-            m_texY->bind(0);
-            m_texUV->bind(3);
+            if(m_texY && m_texUV)
+            {
+                m_texY->bind(0);
+                m_texUV->bind(3);
+            }
+            break;
         }
-        break;
-    }
-    default: break;
+        default: {
+            m_texY->bind();
+            break;
+        }
     }
 #else
 
@@ -270,26 +294,29 @@ void MyOpenGLWidget::paintGL()
     // 释放纹理
     switch (m_format)
     {
-    case AV_PIX_FMT_YUV420P:
-    {
-        if(m_texY && m_texU && m_texV)
+        case AV_PIX_FMT_YUV420P:
         {
-            m_texY->release();
-            m_texU->release();
-            m_texV->release();
+            if(m_texY && m_texU && m_texV)
+            {
+                m_texY->release();
+                m_texU->release();
+                m_texV->release();
+            }
+            break;
         }
-        break;
-    }
-    case AV_PIX_FMT_NV12:
-    {
-        if(m_texY && m_texUV)
+        case AV_PIX_FMT_NV12:
         {
-            m_texY->release();
-            m_texUV->release();
+            if(m_texY && m_texUV)
+            {
+                m_texY->release();
+                m_texUV->release();
+            }
+            break;
         }
-        break;
-    }
-    default: break;
+        default: {
+            m_texY->bind();
+            break;
+        }
     }
 #else
     if(m_texture)

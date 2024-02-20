@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QMovie>
+#include <windows.h>
 
 #define USE_SDL 0
 
@@ -19,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowSystemMenuHint|Qt::WindowMinimizeButtonHint|Qt::WindowMaximizeButtonHint);
     _border = new MyBorderContainer(this);
-
 
     _video_list=new QStringListModel(_list);
     ui->listView->setModel(_video_list);
@@ -128,7 +128,6 @@ void MainWindow::on_window_expanded_clicked()
 {
     QScreen *screen=QGuiApplication::primaryScreen();
     QRect deskrect=screen->availableGeometry();
-    QIcon icon=ui->window_expanded->icon();
     if(this->width()<deskrect.width()){
         QIcon icon1(":/image/image/small_size.png");
         this->setGeometry(deskrect);
@@ -139,13 +138,62 @@ void MainWindow::on_window_expanded_clicked()
         QIcon icon1(":/image/image/window_enlarged.png");
         ui->window_expanded->setIcon(icon1);
     }
-
 }
 
 void MainWindow::on_window_smalled_clicked()
 {
     this->showMinimized();
 }
+
+void MainWindow::on_window_full_clicked()
+{
+    if(!_isFull){
+//        HWND hTask;
+//        hTask = ::FindWindow(L"Shell_TrayWnd",NULL);
+//        // 隐藏任务栏/桌面
+//        ::ShowWindow(hTask,SW_HIDE);
+        QIcon icon1(":/image/image/cancelfullscreen.png");
+        this->showFullScreen();
+
+        ui->lists->hide();
+        ui->titlebar->hide();
+        ui->sliderbox->hide();
+        ui->toolBar->hide();
+        ui->window_full->setIcon(icon1);
+
+
+        ui->video->setMouseTracking(true);
+        ui->player->setMouseTracking(true);
+        ui->centralwidget->setMouseTracking(true);
+        this->setMouseTracking(true);
+        _border->hide(true);
+
+        _isFull=true;
+    }
+    else if(_isFull){
+        this->showNormal();
+        QIcon icon1(":/image/image/fullscreen.png");
+        ui->lists->show();
+        ui->titlebar->show();
+        ui->window_expanded->show();
+        ui->sliderbox->show();
+        ui->toolBar->show();
+        ui->window_full->setIcon(icon1);
+
+        ui->video->setMouseTracking(false);
+        ui->player->setMouseTracking(false);
+        ui->centralwidget->setMouseTracking(false);
+        this->setMouseTracking(false);
+        _border->hide(false);
+
+        _isFull=false;
+//        HWND hTask;
+//        hTask=FindWindow(L"Shell_TrayWnd",NULL);
+//        // 显示任务栏
+//        ::ShowWindow(hTask,SW_SHOW);
+    }
+}
+
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
@@ -189,7 +237,31 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
         //改变窗口的位置
         this->move(_windowTopLeftPoint + distance);
     }
-
+    if(_isFull){
+        QPoint distance = event->globalPos();
+        if(distance.y()<=10 &&
+            ui->video->width()-distance.x()>20){
+            ui->titlebar->show();
+            ui->window_expanded->hide();
+        }
+        else{
+            ui->titlebar->hide();
+        }
+        if(ui->video->height()-distance.y()<=10){
+            ui->sliderbox->show();
+        }
+        else{
+            ui->sliderbox->hide();
+        }
+        if(ui->video->width()-distance.x()<=20 &&
+            distance.y()>10 &&
+            ui->video->height()-distance.y()>10){
+            ui->lists->show();
+        }
+        else{
+            ui->lists->hide();
+        }
+    }
 }
 
 
@@ -234,7 +306,9 @@ void MainWindow::on_open_triggered()
             t->wait();  //必须等待线程结束;
             delete t;
             t=nullptr;
+            ui->video->clear();
         }
+
         ui->multiple->setCurrentText("倍数:1");
         ui->volume_slider->setValue(30);
         QPixmap volume_pix(":/image/image/volume.png");
@@ -413,6 +487,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
         t->wait();  //必须等待线程结束;
         delete t;
         t=nullptr;
+        ui->video->clear();
     }
     ui->multiple->setCurrentText("倍数:1");
     ui->volume_slider->setValue(30);
@@ -544,7 +619,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-
     if(event->key() == Qt::Key_Right){
         disconnect(t,SIGNAL(setProgressTime(qint64)),this,SLOT(setProgressTime(qint64)));
         t->pause();
@@ -563,11 +637,35 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         t->setSeek_time(_currenttime-5);
         _currenttime-=(5);
     }
-
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
+    if(event->key() == Qt::Key_Escape){
+        if(_isFull){
+            this->showNormal();
+            QIcon icon1(":/image/image/fullscreen.png");
+            ui->lists->show();
+            ui->titlebar->show();
+            ui->sliderbox->show();
+            ui->toolBar->show();
+            ui->window_expanded->show();
+            ui->window_full->setIcon(icon1);
+            _isFull=false;
+
+            ui->video->setMouseTracking(false);
+            ui->player->setMouseTracking(false);
+            ui->centralwidget->setMouseTracking(false);
+            this->setMouseTracking(false);
+            _border->hide(false);
+
+//            HWND  hTask;
+//            hTask=FindWindow(L"Shell_TrayWnd",NULL);
+//            // 显示任务栏
+//            ::ShowWindow(hTask,SW_SHOW);
+        }
+    }
+
     if(!_is_open){
         return;
     }
@@ -591,6 +689,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
     else if(event->key() == Qt::Key_Space){
         on_start_clicked();
     }
+
 }
 
 

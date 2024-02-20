@@ -49,12 +49,12 @@ int main1(int argc, char *argv[])
 #define POINT_INFO 0
 
 
-#include "mediademux.h"
-#include "mediadecode.h"
-#include "video_swsscale.h"
+#include "src/handler/mediademux.h"
+#include "src/handler/mediadecode.h"
+#include "src/handler/video_swsscale.h"
 #include "src/widget/qtaudioplay.h"
 #include "ui_mainwindow.h"
-#include "audio_resample.h"
+#include "src/handler/audio_resample.h"
 #include "src/widget/myaudioplay.h"
 #include <thread>
 #include <QThread>

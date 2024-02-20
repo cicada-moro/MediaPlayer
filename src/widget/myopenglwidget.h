@@ -34,6 +34,7 @@ public:
     void init(QSize size);
     void updateImage(const QImage& image);
     void updateImage(AVFrame *frame);
+    void clear();
 
 
 protected:
@@ -59,7 +60,7 @@ private:
     QSize  m_size;
     QSizeF  m_zoomSize;
     QPointF m_pos;
-    int m_format;         // 像素格式
+    int m_format=-1;         // 像素格式
 
     std::mutex _mutex;
 private:

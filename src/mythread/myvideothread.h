@@ -3,8 +3,8 @@
 
 #include <QThread>
 
-#include "../mediadecode.h"
-#include "../video_swsscale.h"
+#include "src/handler/mediadecode.h"
+#include "src/handler/video_swsscale.h"
 #include "src/widget/myopenglwidget.h"
 #include <QWaitCondition>
 #include <QMutex>

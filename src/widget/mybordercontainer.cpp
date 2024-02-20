@@ -64,7 +64,7 @@ void MyBorderContainer::setBorderSize(uint16_t borderSize)
 
 //重绘边框
 void MyBorderContainer::DarwBorder()
-{
+{    
     labelLft->setGeometry(0,0,this->borderSize,m_widget->height());
     labelRit->setGeometry(m_widget->width()-this->borderSize,0,this->borderSize,m_widget->height());
     labelBot->setGeometry(0,m_widget->height()-this->borderSize,m_widget->width(),this->borderSize);
@@ -73,6 +73,30 @@ void MyBorderContainer::DarwBorder()
     labelRT->setGeometry(m_widget->width()-this->borderSize-1,0,m_widget->width(),this->borderSize+1);
     labelLB->setGeometry(0,m_widget->height()-this->borderSize-1,this->borderSize+1,m_widget->width());
     labelLT->setGeometry(0,0,this->borderSize+1,this->borderSize+1);
+}
+
+void MyBorderContainer::hide(bool is)
+{
+    if(is){
+        labelLft->hide();
+        labelRit->hide();
+        labelBot->hide();
+        labelTop->hide();
+        labelRB->hide();
+        labelRT->hide();
+        labelLB->hide();
+        labelLT->hide();
+    }
+    else{
+        labelLft->show();
+        labelRit->show();
+        labelBot->show();
+        labelTop->show();
+        labelRB->show();
+        labelRT->show();
+        labelLB->show();
+        labelLT->show();
+    }
 }
 
 void MyBorderContainer::getLeftScaleEvent(QPoint movPoint)

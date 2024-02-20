@@ -1,6 +1,6 @@
 #include "myvideothread.h"
 #include "./myaudiothread.h"
-#include "../mediademux.h"
+#include "src/handler/mediademux.h"
 
 MyVideoThread::MyVideoThread()
 {

@@ -3,8 +3,8 @@
 
 #include <QThread>
 
-#include "../mediadecode.h"
-#include "../audio_resample.h"
+#include "src/handler/mediadecode.h"
+#include "src/handler/audio_resample.h"
 #include "src/widget/myaudioplay.h"
 #include <QWaitCondition>
 #include <QMutex>
